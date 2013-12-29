@@ -21,7 +21,7 @@ $server = new Server() ;
 $server->expose('PublicName', 'Reference\To\Your\Class') ;
 
 $server->run() ;
-´´´
+```
 
 You can then do POST requests on it with a JSON body in the form of
 
