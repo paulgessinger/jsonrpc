@@ -1,7 +1,7 @@
 <?php
 
 
-namespace PG\JsonRpc\tests\Core;
+namespace PG\JsonRpc\tests;
 
 
 use PG\JsonRpc\Request;
