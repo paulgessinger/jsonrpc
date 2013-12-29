@@ -1,6 +1,6 @@
 <?php
 
-namespace PG\JsonRpc\Core ;
+namespace PG\JsonRpc ;
 
 
 use Monolog\Logger;
@@ -72,7 +72,7 @@ class Call {
 
     /**
      * @param array $params
-     * @return \PG\JsonRpc\Core\ResultInterface
+     * @return \PG\JsonRpc\ResultInterface
      */
     public function execute() {
         try {

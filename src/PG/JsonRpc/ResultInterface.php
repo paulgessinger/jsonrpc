@@ -1,7 +1,7 @@
 <?php
 
 
-namespace PG\JsonRpc\Core;
+namespace PG\JsonRpc;
 
 
 interface ResultInterface {

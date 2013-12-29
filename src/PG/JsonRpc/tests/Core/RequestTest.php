@@ -4,7 +4,7 @@
 namespace PG\JsonRpc\tests\Core;
 
 
-use PG\JsonRpc\Core\Request;
+use PG\JsonRpc\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase {
 

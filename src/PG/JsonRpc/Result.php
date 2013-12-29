@@ -1,7 +1,7 @@
 <?php
 
 
-namespace PG\JsonRpc\Core;
+namespace PG\JsonRpc;
 
 class Result extends AbstractResult {
     private $jsonrpc = '2.0' ;

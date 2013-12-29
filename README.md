@@ -12,7 +12,7 @@ Getting started
 Put something like this in your bootstrap file (e.g. index.php).
 
 ```php
-use PG\JsonRpc\Core\Server ;
+use PG\JsonRpc\Server ;
 
 include __DIR__.'/vendor/autoload.php' ;
 

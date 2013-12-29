@@ -1,6 +1,6 @@
 <?php
 
-use PG\JsonRpc\Core\Server ;
+use PG\JsonRpc\Server ;
 
 include __DIR__.'/vendor/autoload.php' ;
 

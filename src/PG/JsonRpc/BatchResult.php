@@ -1,7 +1,7 @@
 <?php
 
 
-namespace PG\JsonRpc\Core;
+namespace PG\JsonRpc;
 
 use Monolog\Logger;
 use PG\JsonRpc\Exception\InternalError;

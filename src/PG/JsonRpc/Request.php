@@ -1,5 +1,5 @@
 <?php
-namespace PG\JsonRpc\Core ;
+namespace PG\JsonRpc ;
 
 use PG\JsonRpc\Exception\InvalidRequest;
 use PG\JsonRpc\Exception\ParseError;

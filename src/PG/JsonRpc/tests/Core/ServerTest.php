@@ -5,13 +5,13 @@ namespace PG\JsonRpc\tests\Core ;
 
 
 use PG\Common\JSON;
-use PG\JsonRpc\Core\Request;
-use PG\JsonRpc\Core\Server;
+use PG\JsonRpc\Request;
+use PG\JsonRpc\Server;
 
 class ServerTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @var \PG\JsonRpc\Core\Server
+     * @var \PG\JsonRpc\Server
      */
     private $server ;
 

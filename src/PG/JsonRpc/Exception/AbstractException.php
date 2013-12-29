@@ -4,9 +4,9 @@
 namespace PG\JsonRpc\Exception;
 
 
-use PG\JsonRpc\Core\Server;
+use PG\JsonRpc\Server;
 use PG\Common\JSON;
-use PG\JsonRpc\Core\ResultInterface;
+use PG\JsonRpc\ResultInterface;
 
 abstract class AbstractException extends \Exception implements ResultInterface {
     protected $code ;

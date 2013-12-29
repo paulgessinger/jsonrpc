@@ -1,5 +1,5 @@
 <?php
-namespace PG\JsonRpc\Core ;
+namespace PG\JsonRpc ;
 
 use Monolog\Handler\NullHandler;
 use Monolog\Logger;

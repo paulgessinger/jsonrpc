@@ -1,6 +1,6 @@
 <?php
 
-namespace PG\JsonRpc\Core ;
+namespace PG\JsonRpc ;
 
 use Symfony\Component\HttpFoundation\Response as HttpResponse ;
 
