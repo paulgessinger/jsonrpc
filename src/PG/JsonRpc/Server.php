@@ -24,7 +24,18 @@ class Server {
         return $this->logger ;
     }
 
-	function __construct($debug = false, Logger $logger = null) {
+    /**
+     * Constructs the object. You can inject a logger instance here, for
+     * the lib to use.
+     *
+     * Also registers shutdown function and an exception handler to make sure
+     * all errors that could occur are provided to the client in JSON format
+     * with varying debug information.
+     *
+     * @param bool $debug
+     * @param Logger $logger
+     */
+    function __construct($debug = false, Logger $logger = null) {
 		ob_start() ;
 
         self::$debug = $debug ;
@@ -65,6 +76,9 @@ class Server {
         }) ;
 	}
 
+    /**
+     * Runs the current request obtained from globals.
+     */
     public function run() {
 
         $request = Request::createFromGlobals() ;
@@ -73,6 +87,17 @@ class Server {
 
     }
 
+    /**
+     * Exposes a class. All public members of that class become
+     * callable through JSON RPC. Mark everything you want to hide
+     * as private/protected.
+     *
+     * Class members are not exposed.
+     *
+     * @param $name
+     * @param $class
+     * @throws Exception\ClassNotExists
+     */
     public function expose($name, $class) {
         if(!class_exists($class)) {
             throw new ClassNotExists($class) ;
@@ -82,6 +107,10 @@ class Server {
     }
 
     /**
+     * Handles a given Request object and returns
+     * a Response object which can then be sent to the
+     * client.
+     *
      * @param Request $request
      * @return Response
      */

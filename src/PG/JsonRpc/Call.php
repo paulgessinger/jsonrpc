@@ -10,6 +10,11 @@ use PG\JsonRpc\Exception\InvalidParams;
 use PG\JsonRpc\Exception\InvalidRequest;
 use PG\JsonRpc\Exception\MethodNotFound;
 
+/**
+ * Manages business method loading, validation of requests and calling
+ * of business methods.
+ * @package PG\JsonRpc
+ */
 class Call {
 
 	protected $version ;
@@ -19,7 +24,14 @@ class Call {
     private $logger ;
     private $exposed = array() ;
 
-	function __construct($object, array $exposed, Logger $logger) {
+    /**
+     * Constructs the object
+     *
+     * @param $object
+     * @param array $exposed
+     * @param Logger $logger
+     */
+    function __construct($object, array $exposed, Logger $logger) {
 
         $this->logger = $logger ;
         $this->exposed = $exposed ;
@@ -33,23 +45,43 @@ class Call {
 
 	}
 
-	function getVersion() {
+    /**
+     * @return mixed
+     */
+    function getVersion() {
 		return $this->version ;
 	}
 
-	function getMethod() {
+    /**
+     * @return mixed
+     */
+    function getMethod() {
 		return $this->method ;
 	}
 
-	function getParams() {
+    /**
+     * @return mixed
+     */
+    function getParams() {
 		return $this->params ;
 	}
 
-	function getId() {
+    /**
+     * @return mixed
+     */
+    function getId() {
 		return $this->id ;
 	}
 
-	protected function validateRequest($object) {
+    /**
+     * Validates the presence of
+     * all the elements of the request object as described in the spec
+     *
+     * @param $object
+     * @throws Exception\InvalidParams
+     * @throws Exception\InvalidRequest
+     */
+    protected function validateRequest($object) {
 		if(!is_array($object)) {
 			throw new InvalidRequest ;
 		}
@@ -70,7 +102,9 @@ class Call {
 	}
 
     /**
-     * @param array $params
+     * Executes the call, and returns an object which
+     * at least implements the ResultInterface.
+     *
      * @return \PG\JsonRpc\ResultInterface
      */
     public function execute() {
@@ -89,6 +123,14 @@ class Call {
         }
     }
 
+    /**
+     * Sanitizes all parameters with prefix _ before passing them to the log.
+     * This is to prevent sensitive data from leaking into log files.
+     *
+     * @param $params
+     * @param $method_params
+     * @return array
+     */
     private function sanitizeParameters($params, $method_params) {
         $sanitized_parameters = array() ;
 
@@ -129,6 +171,18 @@ class Call {
         return $sanitized_parameters ;
     }
 
+    /**
+     * Call the method specified.
+     * If a method has exactly one argument called $params
+     * it is assumed that the method expects only one parameter
+     * which then contains all other parameters.
+     * If not, the provided parameters are provided as is in order.
+     *
+     * @param $method
+     * @param $params
+     * @return mixed
+     * @throws Exception\InvalidParams
+     */
     private function callMethod($method, $params) {
         $reflection = new \ReflectionMethod(get_class($method[0]), $method[1]) ;
 
@@ -189,10 +243,24 @@ class Call {
         }
     }
 
+    /**
+     * @param array $array
+     * @return bool
+     */
     private function isAssociative(array $array) {
         return !(array_keys($array) === range(0, count($array) - 1)) ;
     }
 
+    /**
+     * Locate a callable resource for a given "method"
+     * as specified in the call.
+     * Methods need to have been exposed in Server before.
+     *
+     * @param $method_string
+     * @return array
+     * @throws Exception\MethodNotFound
+     * @throws Exception\InvalidRequest
+     */
     private function resolveMethod($method_string) {
         $method_array = explode('.', $method_string) ;
 

@@ -6,6 +6,12 @@ namespace PG\JsonRpc;
 use Monolog\Logger;
 use PG\JsonRpc\Exception\InternalError;
 
+/**
+ * Groups multiple Results into one
+ * using a JSON array, to match the spec.
+ *
+ * @package PG\JsonRpc
+ */
 class BatchResult extends AbstractResult {
 
     private $results ;
@@ -15,11 +21,22 @@ class BatchResult extends AbstractResult {
      */
     private $logger ;
 
+    /**
+     * @param Logger $logger
+     * @param $results
+     */
     public function __construct(Logger $logger, $results) {
         $this->results = $results ;
         $this->logger = $logger ;
     }
 
+    /**
+     * Accumulates the array outputs of all
+     * containing results into one array.
+     *
+     * @return array
+     * @throws Exception\InternalError
+     */
     public function toArray() {
         $combined = array() ;
 

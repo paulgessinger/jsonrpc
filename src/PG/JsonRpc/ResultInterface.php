@@ -3,7 +3,10 @@
 
 namespace PG\JsonRpc;
 
-
+/**
+ * Basic structure of what a Result must be capable of.
+ * @package PG\JsonRpc
+ */
 interface ResultInterface {
     /**
      * @return string

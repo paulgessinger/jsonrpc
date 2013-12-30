@@ -6,23 +6,23 @@ use PG\JsonRpc\Exception\ParseError;
 use Symfony\Component\HttpFoundation\Request as HttpRequest ;
 use PG\Common\JSON;
 
+/**
+ * Based on Symfony's HttpFoundation\Request. Only adds a few methods,
+ * and touches nothing the Class itself does.
+ *
+ * @package PG\JsonRpc
+ */
 class Request extends HttpRequest  {
 
+    /**
+     * Factory for creating a request object specific to
+     * a json rpc call (eg. no POST, GET or other data.
+     *
+     * @param $method
+     * @param array $params
+     * @return Request
+     */
     public static function createRPC($method, $params = array()) {
-
-        /**
-         * Constructor.
-         *
-         * @param array  $query      The GET parameters
-         * @param array  $request    The POST parameters
-         * @param array  $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
-         * @param array  $cookies    The COOKIE parameters
-         * @param array  $files      The FILES parameters
-         * @param array  $server     The SERVER parameters
-         * @param string $content    The raw body data
-         *
-         * @api
-         */
 
         $req = JSON::encode(array(
             'jsonrpc' => '2.0',
@@ -43,6 +43,15 @@ class Request extends HttpRequest  {
 
     }
 
+    /**
+     * Extracts an array of calls from the JSON request body.
+     * Normalizes that there can be one request object, or an
+     * array of multiple request objects.
+     *
+     * @return array
+     * @throws Exception\ParseError
+     * @throws Exception\InvalidRequest
+     */
     public function extract() {
         $body = $this->getContent() ;
 
