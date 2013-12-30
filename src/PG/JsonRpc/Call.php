@@ -40,7 +40,15 @@ class Call {
 
 		$this->version = $object['jsonrpc'] ;
 		$this->method = $object['method'] ;
-		$this->params = $object['params'] ;
+
+        if(!array_key_exists('params', $object)) {
+            $this->params = array() ;
+        }
+        else {
+            $this->params = $object['params'] ;
+        }
+
+
 		$this->id = $object['id'] ;
 
 	}
@@ -96,7 +104,7 @@ class Call {
 			throw new InvalidRequest() ;
 		}
 
-        if(!array_key_exists('params', $object) || !is_array($object['params'])) {
+        if(array_key_exists('params', $object) && !is_array($object['params'])) {
             throw new InvalidParams('Parameters must be an array') ;
         }
 	}
@@ -104,6 +112,8 @@ class Call {
     /**
      * Executes the call, and returns an object which
      * at least implements the ResultInterface.
+     *
+     * TODO: Implement notification as in the specification.
      *
      * @return \PG\JsonRpc\ResultInterface
      */
@@ -265,7 +275,7 @@ class Call {
         $method_array = explode('.', $method_string) ;
 
         if(count($method_array) !== 2) {
-            throw new InvalidRequest('Invalid method') ;
+            throw new MethodNotFound('Invalid method structure') ;
         }
 
         $class = $method_array[0] ;

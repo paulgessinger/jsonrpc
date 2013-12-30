@@ -56,19 +56,6 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers \PG\JsonRpc\Server::handle
      */
-    public function testHandleInvalid() {
-
-        // empty request
-        $request = Request::createRPC('', 'POST', array(), array(), array(), array(), '') ;
-
-        $this->setExpectedException('PG\JsonRpc\Exception\InvalidRequest') ;
-
-        $this->server->handle($request) ;
-    }
-
-    /**
-     * @covers \PG\JsonRpc\Server::handle
-     */
     public function testInvalidJson() {
         $request = Request::create('', 'POST', array(), array(), array(), array(), '{"jsonrpc":"2.0","id":1,"method":"Sample.divide","params": [],}') ;
 

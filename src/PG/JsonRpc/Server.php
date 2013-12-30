@@ -124,11 +124,21 @@ class Server {
         $results = array() ;
 
         foreach($calls as $c) {
-            $call = new Call($c, $this->exposed, $this->logger) ;
-            $results[] = $call->execute() ;
+            try {
+                $call = new Call($c, $this->exposed, $this->logger) ;
+                $results[] = $call->execute() ;
+            }
+            catch(AbstractException $e) {
+                if(isset($c['id'])) {
+                    $e->setId($c['id']) ;
+                }
+
+                $results[] = $e ;
+            }
+
         }
 
-        if(count($results) === 1) {
+        if(!$request->isBatch()) {
             $response->setResult($results[0]) ;
         }
         else {

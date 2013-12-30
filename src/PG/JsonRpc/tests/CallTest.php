@@ -150,24 +150,6 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             $this->fail('Exception of type PG\JsonRpc\Exception\InvalidParams was expected') ;
         }
         catch(InvalidParams $e) {}
-
-        // params missing
-        try {
-            new Call(
-                array(
-                    'id' => null,
-                    'jsonrpc' => '2.0',
-                    'method' => 'Sample.divide'
-                ),
-                array(
-                    'Sample' => 'PG\JsonRpc\tests\sample\Sample'
-                ),
-                $this->logger
-            );
-
-            $this->fail('Exception of type PG\JsonRpc\Exception\InvalidParams was expected') ;
-        }
-        catch(InvalidParams $e) {}
     }
 
     /**
@@ -301,7 +283,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
 
         $result = $call->execute() ;
 
-        $this->assertInstanceOf('PG\JsonRpc\Exception\InvalidRequest', $result) ;
+        $this->assertInstanceOf('PG\JsonRpc\Exception\MethodNotFound', $result) ;
         $this->assertEquals('id', $result->getId()) ;
     }
 

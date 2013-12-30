@@ -14,6 +14,12 @@ use PG\Common\JSON;
  */
 class Request extends HttpRequest  {
 
+    private $batch = false ;
+
+    public function isBatch() {
+        return $this->batch ;
+    }
+
     /**
      * Factory for creating a request object specific to
      * a json rpc call (eg. no POST, GET or other data.
@@ -70,6 +76,9 @@ class Request extends HttpRequest  {
 
         if(array_keys($data) === range(0, count($data) - 1)) {
             // this one is a batch request
+
+            $this->batch = true ;
+
             foreach($data as $request_data) {
                 $calls[] = $request_data ;
             }
