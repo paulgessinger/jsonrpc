@@ -1,6 +1,7 @@
 {
     "name": "paulgessinger/jsonrpc",
     "type": "library",
+    "license": "MIT",
     "description": "Lightweight framework for JsonRpc APIs.",
     "authors": [
         {
