@@ -50,31 +50,33 @@ class Server {
         }
 
 		// register shutdown function so that we can report parse errors and such to the client.
-		register_shutdown_function(function() { 
-		    $error = error_get_last(); 
-		    if(isset($error['type'])) {
-				ob_clean() ;
+		register_shutdown_function(array($this, 'handleShutdown'));
 
-				$response = new Response() ;
-                $response->setResult(
-                    new InternalError('Internal error', -32603, ($error['message'].' in '.$error['file'].' on line #'.$error['line']))
-                ) ;
-                $response->send() ;
+        set_exception_handler(array($this, 'handleException')) ;
+	}
 
-				exit();
-			}
-		});
-
-        set_exception_handler(function(AbstractException $e) {
+    public function handleShutdown() {
+        $error = error_get_last();
+        if(isset($error['type'])) {
             ob_clean() ;
 
-            $response = new Response() ;
-            $response->setResult($e) ;
-            $response->send() ;
+            $this->handleException(
+                new InternalError('Internal error', -32603, ($error['message'].' in '.$error['file'].' on line #'.$error['line']))
+            ) ;
 
-            exit();
-        }) ;
-	}
+            //exit();
+        }
+    }
+
+    public function handleException(AbstractException $e) {
+        ob_clean() ;
+
+        $response = new Response() ;
+        $response->setResult($e) ;
+        $response->send() ;
+
+        // exit();
+    }
 
     /**
      * Runs the current request obtained from globals.

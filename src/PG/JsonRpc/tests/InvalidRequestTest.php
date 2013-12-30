@@ -18,9 +18,11 @@ class InvalidRequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
             'id' => 'id',
             'jsonrpc' => '2.0',
-            'code' => -32600,
-            'message' => 'Invalid Request',
-            'data' => ''
+            'error' => array(
+                'code' => -32600,
+                'message' => 'Invalid Request',
+                'data' => ''
+            )
         ), $array) ;
     }
 
@@ -33,9 +35,11 @@ class InvalidRequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
             'id' => 'id',
             'jsonrpc' => '2.0',
-            'code' => -32600,
-            'message' => 'Invalid Request',
-            'data' => ''
+            'error' => array(
+                'code' => -32600,
+                'message' => 'Invalid Request',
+                'data' => ''
+            )
         ), $array) ;
     }
 

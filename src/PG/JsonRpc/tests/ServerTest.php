@@ -6,6 +6,8 @@ namespace PG\JsonRpc\tests ;
 
 use Monolog\Logger;
 use PG\Common\JSON;
+use PG\JsonRpc\Exception\MethodNotFound;
+use PG\JsonRpc\Exception\ParseError;
 use PG\JsonRpc\Request;
 use PG\JsonRpc\Server;
 
@@ -119,10 +121,14 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
         $response = $this->server->handle($request) ;
         $result = JSON::decode($response->getContent()) ;
 
-        $this->assertArrayHasKey('code', $result) ;
-        $this->assertArrayHasKey('message', $result) ;
+        $this->assertArrayHasKey('error', $result) ;
 
-        $this->assertEquals(-32602, $result['code']) ;
+        $error = $result['error'] ;
+
+        $this->assertArrayHasKey('code', $error) ;
+        $this->assertArrayHasKey('message', $error) ;
+
+        $this->assertEquals(-32602, $error['code']) ;
     }
 
     /**
@@ -159,6 +165,26 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
     public function testGetLogger() {
         $logger = $this->server->getLogger() ;
         $this->assertInstanceOf('\Monolog\Logger', $logger) ;
+    }
+
+    public function testHandleException() {
+        ob_start() ;
+
+        $this->server->handleException(new ParseError('something went wrong')) ;
+
+        $ob = ob_get_clean() ;
+
+        $output = JSON::decode($ob) ;
+
+        $this->assertEquals(array(
+            'id' => null,
+            'jsonrpc' => '2.0',
+            'error' => array(
+                'code' => -32700,
+                'data' => 'something went wrong',
+                'message' => 'Parse error'
+            )
+        ), $output) ;
     }
 }
  

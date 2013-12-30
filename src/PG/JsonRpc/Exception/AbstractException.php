@@ -46,16 +46,21 @@ abstract class AbstractException extends \Exception implements ResultInterface {
      * @return array
      */
     public function toArray() {
-        $result = array(
-            'id' => $this->id,
-            'jsonrpc' => '2.0',
+        $error = array(
             'code' => $this->code,
             'message' => $this->message
         ) ;
 
         if(Server::$debug) {
-            $result['data'] = $this->data ;
+            $error['data'] = $this->data ;
         }
+
+        $result = array(
+            'id' => $this->id,
+            'jsonrpc' => '2.0',
+            'error' => $error
+        ) ;
+
 
         return $result ;
     }
