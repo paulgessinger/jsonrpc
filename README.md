@@ -1,5 +1,7 @@
 #JSONRPC for PHP
 
+[![Build Status](https://travis-ci.org/paulgessinger/jsonrpc.png?branch=master)](https://travis-ci.org/paulgessinger/jsonrpc)
+
 Allows you to write simple and fast JSON RPC APIs by exposing arbitrary objects to HTTP POST requests.
 
 ## Installation
