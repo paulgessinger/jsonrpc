@@ -8,6 +8,10 @@ use PG\JsonRpc\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase {
 
+    public function testCreateRPC() {
+        Request::createRPC('Sample.divide', array(5, 3)) ;
+    }
+
     public function testExtractSingle() {
         $request = Request::create('', 'POST', array(), array(), array(), array(), '{"jsonrpc":"2.0","id":1,"method":"Sample.divide","params": [11, 5]}') ;
 
@@ -47,6 +51,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $request = Request::create('', 'POST', array(), array(), array(), array(), '{"jsonrpc":"2.0","id":1,"method":"Sample.divide","params": [],}') ;
 
         $this->setExpectedException('PG\JsonRpc\Exception\ParseError') ;
+
+        $request->extract() ;
+    }
+
+    public function testExtractNonArrayBody() {
+        $request = Request::create('', 'POST', array(), array(), array(), array(), '"hallo"') ;
+
+        $this->setExpectedException('PG\JsonRpc\Exception\InvalidRequest') ;
 
         $request->extract() ;
     }

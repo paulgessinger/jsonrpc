@@ -4,6 +4,7 @@
 namespace PG\JsonRpc\tests ;
 
 
+use Monolog\Logger;
 use PG\Common\JSON;
 use PG\JsonRpc\Request;
 use PG\JsonRpc\Server;
@@ -24,10 +25,25 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
         \Mockery::close() ;
     }
 
+    /**
+     * @covers \PG\JsonRpc\Server::__construct
+     */
     public function testConstruct() {
         $this->assertInstanceOf('Monolog\Logger', $this->server->getLogger()) ;
     }
 
+    public function testConstructExplicitLogger() {
+        $logger = new Logger('PHPUnit') ;
+
+        $server = new Server(false, $logger) ;
+
+        $this->assertInstanceOf('Monolog\Logger', $server->getLogger()) ;
+        $this->assertEquals($logger, $server->getLogger()) ;
+    }
+
+    /**
+     * @covers \PG\JsonRpc\Server::run
+     */
     public function testRun() {
         $this->setExpectedException('PG\JsonRpc\Exception\InvalidRequest') ;
 
@@ -35,6 +51,9 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
         $this->server->run() ;
     }
 
+    /**
+     * @covers \PG\JsonRpc\Server::handle
+     */
     public function testHandleInvalid() {
 
         // empty request
@@ -45,6 +64,9 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
         $this->server->handle($request) ;
     }
 
+    /**
+     * @covers \PG\JsonRpc\Server::handle
+     */
     public function testInvalidJson() {
         $request = Request::create('', 'POST', array(), array(), array(), array(), '{"jsonrpc":"2.0","id":1,"method":"Sample.divide","params": [],}') ;
 
@@ -53,12 +75,18 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
         $this->server->handle($request) ;
     }
 
+    /**
+     * @covers \PG\JsonRpc\Server::expose
+     */
     public function testExposeClassNotExist() {
         $this->setExpectedException('PG\JsonRpc\Exception\ClassNotExists') ;
 
         $this->server->expose('Sample', 'Does\Not\Exist') ;
     }
 
+    /**
+     * @covers \PG\JsonRpc\Server::expose
+     */
     public function testExposeClassExist() {
 
         \Mockery::mock('\Does\Exist') ;
@@ -66,6 +94,9 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
         $this->server->expose('Sample', 'Does\Exist') ;
     }
 
+    /**
+     * @covers \PG\JsonRpc\Server::handle
+     */
     public function testRouting() {
         $this->server->expose('Sample', 'PG\JsonRpc\tests\sample\Sample') ;
         $request = Request::createRPC('Sample.divide', array(17, 4)) ;
@@ -76,6 +107,9 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(17/4, $result['result']) ;
     }
 
+    /**
+     * @covers \PG\JsonRpc\Server::handle
+     */
     public function testInvalidParameters() {
         $this->server->expose('Sample', 'PG\JsonRpc\tests\sample\Sample') ;
 
@@ -91,6 +125,9 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(-32602, $result['code']) ;
     }
 
+    /**
+     * @covers \PG\JsonRpc\Server::handle
+     */
     public function testIdIsPreserved() {
         $this->server->expose('Sample', 'PG\JsonRpc\tests\sample\Sample') ;
 
@@ -114,6 +151,14 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
             ),
         ), $result) ;
 
+    }
+
+    /**
+     * @covers \PG\JsonRpc\Server::getLogger
+     */
+    public function testGetLogger() {
+        $logger = $this->server->getLogger() ;
+        $this->assertInstanceOf('\Monolog\Logger', $logger) ;
     }
 }
  

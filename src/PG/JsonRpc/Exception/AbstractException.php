@@ -12,27 +12,21 @@ abstract class AbstractException extends \Exception implements ResultInterface {
     protected $code ;
     protected $message ;
     protected $data ;
+    protected $id ;
 
-    /**
-     * @param null $data
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
+    public function setId($id) {
+        $this->id = $id ;
     }
 
-    /**
-     * @return null
-     */
-    public function getData()
-    {
-        return $this->data;
+    public function getId() {
+        return $this->id ;
     }
 
-    public function __construct($message = null, $code = null, $data = null) {
+    public function __construct($message = null, $code = null, $data = null, $id = null) {
         $this->message = $message ;
         $this->code = $code ;
         $this->data = $data ;
+        $this->id = $id ;
     }
 
     /**
@@ -44,6 +38,8 @@ abstract class AbstractException extends \Exception implements ResultInterface {
 
     public function toArray() {
         $result = array(
+            'id' => $this->id,
+            'jsonrpc' => '2.0',
             'code' => $this->code,
             'message' => $this->message
         ) ;

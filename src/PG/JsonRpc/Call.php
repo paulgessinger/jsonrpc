@@ -59,13 +59,12 @@ class Call {
 			|| $object['jsonrpc'] !== '2.0'
 			|| !array_key_exists('method', $object)
 			|| empty($object['method'])
-			|| !array_key_exists('params', $object)
 			|| !array_key_exists('id', $object)
 		) {
 			throw new InvalidRequest() ;
 		}
 
-        if(!is_array($object['params'])) {
+        if(!array_key_exists('params', $object) || !is_array($object['params'])) {
             throw new InvalidParams('Parameters must be an array') ;
         }
 	}
@@ -82,17 +81,36 @@ class Call {
             return new Result($this->getId(), $result) ;
         }
         catch(AbstractException $e ) {
+            $e->setId($this->getId()) ;
             return $e ;
         }
         catch(\Exception $e) { // catch EVERYTHING, is this a good idea?
-            return new InternalError('Internal error', -32603, $e->__toString()) ;
+            return new InternalError('Internal error', -32603, $e->__toString(), $this->getId()) ;
         }
     }
 
     private function sanitizeParameters($params, $method_params) {
         $sanitized_parameters = array() ;
 
-        for($i=0;$i<count($params);$i++) {
+        if($this->isAssociative($params)) {
+            $sanitized_parameters[] = 'Array' ;
+            return $sanitized_parameters ;
+        }
+
+        $limit = 0 ;
+        if(count($params) > count($method_params)) {
+            $limit = count($method_params) ;
+        }
+
+        if(count($params) <= count($method_params)) {
+            $limit = count($params) ;
+        }
+
+        if(count($method_params) === 0 || count($params) === 0) {
+            return $params ;
+        }
+
+        for($i=0;$i<$limit;$i++) {
             if(substr($method_params[$i]->getName(), 0, 1) === '_') {
                 // sanitize this one
                 $sanitized_parameters[$i] = '*REMOVED*' ;
@@ -138,7 +156,7 @@ class Call {
         if($method_parameters[0]->getName() === 'params' && count($method_parameters) === 1) {
             // method wants passing by name
 
-            if(array_keys($params) === range(0, count($params) - 1)) {
+            if(!$this->isAssociative($params)) {
                 // call is by order => invalid
                 throw new InvalidParams('method call with params by order, params by name expected.') ;
             }
@@ -149,7 +167,7 @@ class Call {
         } else {
             // method wants passing by order
 
-            if(array_keys($params) !== range(0, count($params) - 1)) {
+            if($this->isAssociative($params)) {
                 // call is by name => invalid
                 throw new InvalidParams('method call with params by name, params by order expected.') ;
             }
@@ -169,6 +187,10 @@ class Call {
             // call also is by order => good to go
             return call_user_func_array($method, $params) ;
         }
+    }
+
+    private function isAssociative(array $array) {
+        return !(array_keys($array) === range(0, count($array) - 1)) ;
     }
 
     private function resolveMethod($method_string) {
