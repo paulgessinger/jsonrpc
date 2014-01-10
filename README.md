@@ -24,7 +24,7 @@ include __DIR__.'/vendor/autoload.php' ;
 
 $server = new Server() ;
 
-server->expose('Sample', 'PG\JsonRpc\tests\sample\Sample') ;
+$server->expose('Sample', 'PG\JsonRpc\tests\sample\Sample') ;
 
 $server->run() ;
 ```
