@@ -64,4 +64,23 @@ class Sample {
         return 1 ;
     }
 
+    public function triggerError() {
+        trigger_error('Sample', E_USER_ERROR) ;
+
+        return 'done' ;
+    }
+
+    public function triggerWarning() {
+        trigger_error('Sample', E_USER_WARNING) ;
+
+        return 'successful result' ;
+    }
+
+    public function triggerNotice() {
+        trigger_error('Sample', E_USER_NOTICE) ;
+
+        return 'successful result' ;
+    }
+
+
 } 

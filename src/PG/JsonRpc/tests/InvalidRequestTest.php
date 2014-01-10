@@ -20,8 +20,8 @@ class InvalidRequestTest extends \PHPUnit_Framework_TestCase {
             'jsonrpc' => '2.0',
             'error' => array(
                 'code' => -32600,
-                'message' => 'Invalid Request',
-                'data' => ''
+                'message' => 'Invalid Request'/*,
+                'data' => ''*/
             )
         ), $array) ;
     }
@@ -37,8 +37,8 @@ class InvalidRequestTest extends \PHPUnit_Framework_TestCase {
             'jsonrpc' => '2.0',
             'error' => array(
                 'code' => -32600,
-                'message' => 'Invalid Request',
-                'data' => ''
+                'message' => 'Invalid Request'/*,
+                'data' => ''*/
             )
         ), $array) ;
     }

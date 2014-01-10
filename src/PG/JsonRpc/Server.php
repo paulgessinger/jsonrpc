@@ -51,9 +51,30 @@ class Server {
 
 		// register shutdown function so that we can report parse errors and such to the client.
 		register_shutdown_function(array($this, 'handleShutdown'));
+        set_error_handler(array($this, 'handleError')) ;
 
         set_exception_handler(array($this, 'handleException')) ;
 	}
+
+    public function handleError($code, $msg, $file, $line) {
+        $allowed = array(
+            E_USER_WARNING,
+            E_USER_NOTICE,
+            E_NOTICE,
+            E_WARNING
+        ) ;
+
+        if(in_array($code, $allowed)) {
+            return ;
+        }
+        else {
+            // this seems to be a serious error, print error response and exit.
+            ob_clean() ;
+
+            throw new InternalError('Internal error', -32603, ($msg.' in '.$file.' on line #'.$line)) ;
+        }
+    }
+
 
     public function handleShutdown() {
         $error = error_get_last();
