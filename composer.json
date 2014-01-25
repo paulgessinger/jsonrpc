@@ -15,7 +15,8 @@
         "phpdocumentor/reflection-docblock": "1.0.*",
         "paulgessinger/common": "*",
         "symfony/http-foundation": "2.5.*@dev",
-        "monolog/monolog": "*"
+        "monolog/monolog": "*",
+        "pimple/pimple": "2.0.*@dev"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",

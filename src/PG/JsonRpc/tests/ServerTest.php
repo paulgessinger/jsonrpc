@@ -31,16 +31,18 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
      * @covers \PG\JsonRpc\Server::__construct
      */
     public function testConstruct() {
-        $this->assertInstanceOf('Monolog\Logger', $this->server->getLogger()) ;
+        var_dump($this->server['logger']) ;
+        $this->assertInstanceOf('Monolog\Logger', $this->server['logger']) ;
     }
 
     public function testConstructExplicitLogger() {
         $logger = new Logger('PHPUnit') ;
 
-        $server = new Server(false, $logger) ;
+        $server = new Server(false) ;
+        $server['logger'] = $logger ;
 
-        $this->assertInstanceOf('Monolog\Logger', $server->getLogger()) ;
-        $this->assertEquals($logger, $server->getLogger()) ;
+        $this->assertInstanceOf('Monolog\Logger', $server['logger']) ;
+        $this->assertEquals($logger, $server['logger']) ;
     }
 
     /**
@@ -144,14 +146,6 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
             ),
         ), $result) ;
 
-    }
-
-    /**
-     * @covers \PG\JsonRpc\Server::getLogger
-     */
-    public function testGetLogger() {
-        $logger = $this->server->getLogger() ;
-        $this->assertInstanceOf('\Monolog\Logger', $logger) ;
     }
 
     public function testHandleException() {

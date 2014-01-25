@@ -13,15 +13,22 @@ use PG\JsonRpc\Server;
 
 class CallTest extends \PHPUnit_Framework_TestCase {
 
-    private $logger ;
+    /**
+     * @var \Pimple
+     */
+    private $app ;
+
+    public function __construct() {
+        $this->app = new \Pimple() ;
+        parent::__construct() ;
+    }
 
     public function setUp() {
-        $this->logger = new Logger('phpunit', array(new NullHandler())) ;
+        $this->app['logger'] = new Logger('phpunit', array(new NullHandler())) ;
         Server::$debug = true ;
     }
 
     public function tearDown() {
-        unset($this->logger) ;
 
         \Mockery::close() ;
     }
@@ -41,7 +48,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
     }
 
@@ -51,7 +58,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
 
         $this->assertEquals('2.0', $call->getVersion()) ;
@@ -70,7 +77,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
                 array(
                     'Sample' => 'PG\JsonRpc\tests\sample\Sample'
                 ),
-                $this->logger
+                $this->app
             );
 
             $this->fail('Exception of type PG\JsonRpc\Exception\InvalidRequest was expected') ;
@@ -88,7 +95,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
                 array(
                     'Sample' => 'PG\JsonRpc\tests\sample\Sample'
                 ),
-                $this->logger
+                $this->app
             );
 
             $this->fail('Exception of type PG\JsonRpc\Exception\InvalidRequest was expected') ;
@@ -108,7 +115,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
                 array(
                     'Sample' => 'PG\JsonRpc\tests\sample\Sample'
                 ),
-                $this->logger
+                $this->app
             );
 
             $this->fail('Exception of type PG\JsonRpc\Exception\InvalidRequest was expected') ;
@@ -123,7 +130,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
                 array(
                     'Sample' => 'PG\JsonRpc\tests\sample\Sample'
                 ),
-                $this->logger
+                $this->app
             );
 
             $this->fail('Exception of type PG\JsonRpc\Exception\InvalidRequest was expected') ;
@@ -144,7 +151,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
                 array(
                     'Sample' => 'PG\JsonRpc\tests\sample\Sample'
                 ),
-                $this->logger
+                $this->app
             );
 
             $this->fail('Exception of type PG\JsonRpc\Exception\InvalidParams was expected') ;
@@ -161,7 +168,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
 
         $result = $call->execute() ;
@@ -176,7 +183,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
 
         $result = $call->execute() ;
@@ -195,7 +202,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
 
         $result = $call->execute() ;
@@ -211,7 +218,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
 
         $result = $call->execute() ;
@@ -227,7 +234,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
 
         $result = $call->execute() ;
@@ -246,7 +253,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
 
         $result = $call->execute() ;
@@ -263,7 +270,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
 
         $result = $call->execute() ;
@@ -278,7 +285,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
 
         $result = $call->execute() ;
@@ -293,7 +300,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
 
         $result = $call->execute() ;
@@ -308,7 +315,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
 
         $result = $call->execute() ;
@@ -323,7 +330,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $this->logger
+            $this->app
         );
 
         $result = $call->execute() ;
@@ -348,12 +355,15 @@ class CallTest extends \PHPUnit_Framework_TestCase {
                 )
             )) ;
 
+        $app = new \Pimple() ;
+        $app['logger'] = $logger ;
+
         $call = new Call(
             $this->makeCall('Sample.withPassword', array('should.be.hidden', 'phpunit@example.com')),
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $logger
+            $app
         );
 
         $call->execute() ;
@@ -374,12 +384,15 @@ class CallTest extends \PHPUnit_Framework_TestCase {
                 )
             )) ;
 
+        $app = new \Pimple() ;
+        $app['logger'] = $logger ;
+
         $call = new Call(
             $this->makeCall('Sample.withArray', array(array(1, 2, 3))),
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
-            $logger
+            $app
         );
 
         $call->execute() ;

@@ -21,20 +21,20 @@ class Call {
 	protected $method ;
 	protected $params ;
 	protected $id ;
-    private $logger ;
     private $exposed = array() ;
+    private $app ;
 
     /**
      * Constructs the object
      *
      * @param $object
      * @param array $exposed
-     * @param Logger $logger
+     * @param Server $server
      */
-    function __construct($object, array $exposed, Logger $logger) {
+    function __construct($object, array $exposed, \Pimple $app) {
 
-        $this->logger = $logger ;
         $this->exposed = $exposed ;
+        $this->app = $app ;
 
 		$this->validateRequest($object) ;
 
@@ -210,7 +210,7 @@ class Call {
             // params marked as sensitive, such as pwd. In prod we dont log anything at all here.
 
             $sanitized_parameters = $this->sanitizeParameters($params, $method_parameters) ;
-            $this->logger->addDebug('Executing method.', array('method' => get_class($method[0]).'.'.$method[1], 'params' => $sanitized_parameters)) ;
+            $this->app['logger']->addDebug('Executing method.', array('method' => get_class($method[0]).'.'.$method[1], 'params' => $sanitized_parameters)) ;
         }
 
         if(count($method_parameters) === 0) {
@@ -302,7 +302,7 @@ class Call {
             throw new MethodNotFound('Method '.$method.' in scope '.$class.' is not public (this is probably a bug in server software).') ;
         }
 
-        $callable = array(new $real_class, $method) ;
+        $callable = array(new $real_class($this->app), $method) ;
 
         if(!is_callable($callable)) {
             throw new MethodNotFound('Method '.$method.' in scope '.$class.' is not callable (this is probably a bug in server software).') ;

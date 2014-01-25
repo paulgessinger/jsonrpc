@@ -8,6 +8,10 @@ use PG\JsonRpc\Exception\ArgumentException;
 
 class Sample {
 
+    public function __construct(\Pimple $app) {
+        // we want a pimple instance!
+    }
+
     /**
      * @param float $a
      * @param float $b

@@ -1,4 +1,4 @@
-<phpunit bootstrap="src/PG/JsonRpc/tests/bootstrap.php">
+<phpunit bootstrap="src/PG/JsonRpc/tests/bootstrap.php" colors="true">
     <testsuite name="jsonrpc">
         <directory>./src/PG/JsonRpc/tests</directory>
     </testsuite>

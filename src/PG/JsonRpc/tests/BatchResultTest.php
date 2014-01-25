@@ -12,10 +12,11 @@ use PG\JsonRpc\Result;
 
 class BatchResultTest extends \PHPUnit_Framework_TestCase {
 
-    private $logger ;
+    private $app ;
 
     public function setUp() {
-        $this->logger = new Logger('phpunit', array(new NullHandler())) ;
+        $this->app = new \Pimple() ;
+        $this->app['logger'] = new Logger('phpunit', array(new NullHandler())) ;
     }
 
     public function tearDown() {
@@ -23,11 +24,11 @@ class BatchResultTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testConstruct() {
-        new BatchResult($this->logger, array()) ;
+        new BatchResult($this->app, array()) ;
     }
 
     public function testToArrayInvalidResults() {
-        $batch = new BatchResult($this->logger, array(
+        $batch = new BatchResult($this->app, array(
             'something_wrong'
         )) ;
 
@@ -40,7 +41,7 @@ class BatchResultTest extends \PHPUnit_Framework_TestCase {
      * @covers \PG\JsonRpc\BatchResult::toArray
      */
     public function testToArray() {
-        $batch = new BatchResult($this->logger, array(
+        $batch = new BatchResult($this->app, array(
             new Result('id', 'some_result')
         )) ;
 
@@ -60,7 +61,7 @@ class BatchResultTest extends \PHPUnit_Framework_TestCase {
      * @covers \PG\JsonRpc\AbstractResult::toJSON
      */
     public function testToJson() {
-        $batch = new BatchResult($this->logger, array(
+        $batch = new BatchResult($this->app, array(
             new Result('id', 'some_result')
         )) ;
 

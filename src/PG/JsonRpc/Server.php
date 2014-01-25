@@ -13,16 +13,12 @@ use PG\JsonRpc\Exception\InternalError;
  * @package ccjsonrpcapi
  * @author Paul Gessinger
  */
-class Server {
+class Server extends \Pimple {
 
     public static $debug = false ;
 
-    private $logger  ;
     private $exposed = array() ;
 
-    public function getLogger() {
-        return $this->logger ;
-    }
 
     /**
      * Constructs the object. You can inject a logger instance here, for
@@ -33,21 +29,17 @@ class Server {
      * with varying debug information.
      *
      * @param bool $debug
-     * @param Logger $logger
      */
-    function __construct($debug = false, Logger $logger = null) {
+    function __construct($debug = false) {
 		ob_start() ;
 
         self::$debug = $debug ;
 
-        if($logger === null) {
-            $this->logger = new Logger('jsonrpc') ;
-            $this->logger->pushHandler(new NullHandler()) ;
-
-        }
-        else {
-            $this->logger = $logger ;
-        }
+        $this['logger'] = function($c) {
+            $logger = new Logger('jsonrpc') ;
+            $logger->pushHandler(new NullHandler()) ;
+            return $logger ;
+        } ;
 
 		// register shutdown function so that we can report parse errors and such to the client.
 		register_shutdown_function(array($this, 'handleShutdown'));
@@ -146,7 +138,7 @@ class Server {
 
         foreach($calls as $c) {
             try {
-                $call = new Call($c, $this->exposed, $this->logger) ;
+                $call = new Call($c, $this->exposed, $this) ;
                 $results[] = $call->execute() ;
             }
             catch(AbstractException $e) {
@@ -163,7 +155,7 @@ class Server {
             $response->setResult($results[0]) ;
         }
         else {
-            $response->setResult(new BatchResult($this->logger, $results)) ;
+            $response->setResult(new BatchResult($this, $results)) ;
         }
 
         return $response ;

@@ -16,18 +16,15 @@ class BatchResult extends AbstractResult {
 
     private $results ;
 
-    /**
-     * @var \Monolog\Logger
-     */
-    private $logger ;
+    private $app ;
 
     /**
-     * @param Logger $logger
+     * @param Server $server
      * @param $results
      */
-    public function __construct(Logger $logger, $results) {
+    public function __construct(\Pimple $app, $results) {
         $this->results = $results ;
-        $this->logger = $logger ;
+        $this->app = $app ;
     }
 
     /**
@@ -42,7 +39,7 @@ class BatchResult extends AbstractResult {
 
         foreach($this->results as $result) {
             if(!($result instanceof ResultInterface)) {
-                $this->logger->addCritical('A returned result did not implement ResultInterface') ;
+                $this->app['logger']->addCritical('A returned result did not implement ResultInterface') ;
                 throw new InternalError() ; // this should not happen
             }
             $combined[] = $result->toArray() ;
