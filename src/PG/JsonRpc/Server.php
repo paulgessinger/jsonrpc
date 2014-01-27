@@ -31,6 +31,7 @@ class Server extends \Pimple {
      * @param bool $debug
      */
     function __construct($debug = false) {
+        parent::__construct() ;
 		ob_start() ;
 
         self::$debug = $debug ;
