@@ -42,7 +42,9 @@ class BatchResult extends AbstractResult {
                 $this->app['logger']->addCritical('A returned result did not implement ResultInterface') ;
                 throw new InternalError() ; // this should not happen
             }
-            $combined[] = $result->toArray() ;
+            if(count($result->toArray()) > 0) { // this was a notification, no response at all
+                $combined[] = $result->toArray() ;
+            }
         }
 
         return $combined ;

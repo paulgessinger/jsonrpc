@@ -29,7 +29,7 @@ class SpecificationTest extends \PHPUnit_Framework_TestCase {
         ) ;
     }
 
-    public function testNonExistendMethod() {
+    public function testNonExistentMethod() {
         $response = $this->factory('{"jsonrpc": "2.0", "method": "foobar", "id": "1"}') ;
 
         $this->assertJSONEquals(
@@ -55,8 +55,8 @@ class SpecificationTest extends \PHPUnit_Framework_TestCase {
     public function testInvalidRequestObject() {
 
         $this->assertJSONEquals(
-            '{"jsonrpc": "2.0", "error": {"code": -32600, "message": "Invalid Request"}, "id": null}',
-            $this->factory('{"jsonrpc": "2.0", "method": 1, "params": "bar"}')->getContent()
+            '{"jsonrpc": "2.0", "error": {"code": -32600, "message": "Invalid Request"}, "id": 0}',
+            $this->factory('{"jsonrpc": "2", "method": 1, "params": "bar", "id":0}')->getContent()
         );
 
     }
@@ -118,6 +118,50 @@ JSON;
         );
     }
 
+
+    public function testNotification() {
+        $server = new Server() ;
+        $server->expose('Sample', 'PG\JsonRpc\tests\sample\Sample') ;
+
+        // regular notification request to divide
+        // this should not return a body
+        $request = Request::create('', 'POST', array(), array(), array(), array(), '{"jsonrpc": "2.0", "method": "Sample.divide", "params": [10, 5]}') ;
+        $response = $server->handle($request) ;
+        $this->assertEmpty($response->getContent(), 'Notification MUST NOT return a response at all.') ;
+
+        // divide with error
+        // no body as well
+        $request = Request::create('', 'POST', array(), array(), array(), array(), '{"jsonrpc": "2.0", "method": "Sample.divide", "params": [10, 0]}') ;
+        $response = $server->handle($request) ;
+        $this->assertEmpty($response->getContent(), 'Notification MUST NOT return a response at all.') ;
+    }
+
+    public function testNotificationInBatchRequest() {
+        $server = new Server() ;
+        $server->expose('Sample', 'PG\JsonRpc\tests\sample\Sample') ;
+
+        $body = <<<JSON
+[
+{"jsonrpc": "2.0", "method": "Sample.divide", "params": [10, 0], "id":1},
+{"jsonrpc": "2.0", "method": "Sample.divide", "params": [10, 5], "id":2},
+{"jsonrpc": "2.0", "method": "Sample.divide", "params": [10, 5]},
+{"jsonrpc": "2.0", "method": "Sample.divide", "params": [10, 0]},
+{"jsonrpc": "2.0", "method": "Sample.divide", "params": [10, 5], "id":3}
+]
+JSON;
+
+        $expected = <<<JSON
+[{"id":1,"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params"}},{"jsonrpc":"2.0","result":2,"id":2},{"jsonrpc":"2.0","result":2,"id":3}]
+JSON;
+
+
+        $request = Request::create('', 'POST', array(), array(), array(), array(), $body) ;
+        $response = $server->handle($request) ;
+        $this->assertJSONEquals(
+            $response->getContent(),
+            $expected
+        ) ;
+    }
 
 }
  

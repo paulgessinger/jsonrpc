@@ -104,7 +104,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
 
     }
 
-    public function testConstructNoId() {
+    /*public function testConstructNoId() {
         try {
             new Call(
                 array(
@@ -121,7 +121,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
             $this->fail('Exception of type PG\JsonRpc\Exception\InvalidRequest was expected') ;
         }
         catch(InvalidRequest $e) {}
-    }
+    }*/
 
     public function testConstructNotObject() {
         try {
@@ -228,9 +228,13 @@ class CallTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('id', $result->getId()) ;
     }
 
-    public function testParamsByNameFailure() {
+    /**
+     * @covers \PG\JsonRpc\Call
+     */
+    public function testParamsByNameSuccess() {
+        // same order
         $call = new Call(
-            $this->makeCall('Sample.divideName', array(5, 5)),
+            $this->makeCall('Sample.divide', array('a' => 12, 'b' => 5)),
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
@@ -238,18 +242,15 @@ class CallTest extends \PHPUnit_Framework_TestCase {
         );
 
         $result = $call->execute() ;
+        $array = $result->toArray() ;
 
-        $this->assertInstanceOf('PG\JsonRpc\ResultInterface', $result) ;
-        $this->assertInstanceOf('PG\JsonRpc\Exception\InvalidParams', $result) ;
-        $this->assertEquals('id', $result->getId()) ;
-    }
+        $this->assertInstanceOf('PG\JsonRpc\Result', $result) ;
 
-    /**
-     * @covers \PG\JsonRpc\Call
-     */
-    public function testParamsByNameSuccess() {
+        $this->assertEquals($array['result'], 12/5) ;
+
+        // inverted order, should still work
         $call = new Call(
-            $this->makeCall('Sample.divideName', array('a' => 12, 'b' => 5)),
+            $this->makeCall('Sample.divide', array('b' => 5, 'a' => 12)),
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
@@ -264,9 +265,12 @@ class CallTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($array['result'], 12/5) ;
     }
 
-    public function testParamsByOrderFailure() {
+    /**
+     * @covers \PG\JsonRpc\Call
+     */
+    public function testParamsByNameFailure() {
         $call = new Call(
-            $this->makeCall('Sample.divide', array('a' => 12, 'b' => 5)),
+            $this->makeCall('Sample.divide', array('b' => 5, 'c' => 12)),
             array(
                 'Sample' => 'PG\JsonRpc\tests\sample\Sample'
             ),
@@ -274,7 +278,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
         );
 
         $result = $call->execute() ;
-
+        $this->assertInstanceOf('PG\JsonRpc\ResultInterface', $result) ;
         $this->assertInstanceOf('PG\JsonRpc\Exception\InvalidParams', $result) ;
         $this->assertEquals('id', $result->getId()) ;
     }

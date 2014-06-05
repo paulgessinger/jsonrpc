@@ -68,7 +68,7 @@ class Server extends \Pimple {
         }
     }
 
-
+    //@codeCoverageIgnoreStart
     public function handleShutdown() {
         $error = error_get_last();
         if(isset($error['type'])) {
@@ -81,6 +81,7 @@ class Server extends \Pimple {
             //exit();
         }
     }
+    //@codeCoverageIgnoreEnd
 
     public function handleException(AbstractException $e) {
         ob_clean() ;
@@ -95,6 +96,7 @@ class Server extends \Pimple {
     /**
      * Runs the current request obtained from globals.
      */
+    //@codeCoverageIgnoreStart
     public function run() {
 
         $request = Request::createFromGlobals() ;
@@ -102,6 +104,7 @@ class Server extends \Pimple {
         $response->send() ;
 
     }
+    //@codeCoverageIgnoreEnd
 
     /**
      * Exposes a class. All public members of that class become

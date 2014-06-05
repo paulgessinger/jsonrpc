@@ -18,6 +18,10 @@ class Sample {
      * @return float
      */
     public function divide($a, $b) {
+        if($b === 0 || $b === 0.0) {
+            throw new ArgumentException('Cannot divide by zero') ;
+        }
+
         return $a/$b ;
     }
 

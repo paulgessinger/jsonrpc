@@ -2,8 +2,6 @@
 
 namespace PG\JsonRpc ;
 
-
-use Monolog\Logger;
 use PG\JsonRpc\Exception\AbstractException;
 use PG\JsonRpc\Exception\InternalError;
 use PG\JsonRpc\Exception\InvalidParams;
@@ -20,7 +18,7 @@ class Call {
 	protected $version ;
 	protected $method ;
 	protected $params ;
-	protected $id ;
+	protected $id = null ;
     private $exposed = array() ;
     private $app ;
 
@@ -29,7 +27,8 @@ class Call {
      *
      * @param $object
      * @param array $exposed
-     * @param Server $server
+     * @param \Pimple $app
+     * @internal param \PG\JsonRpc\Server $server
      */
     function __construct($object, array $exposed, \Pimple $app) {
 
@@ -48,10 +47,19 @@ class Call {
             $this->params = $object['params'] ;
         }
 
-
-		$this->id = $object['id'] ;
-
+        if(array_key_exists('id', $object)) {
+            // this is not a notification
+            $this->id = $object['id'] ;
+        }
+        else {
+            // this is a notification, no id
+            $this->id = false ;
+        }
 	}
+
+    public function isNotification() {
+        return $this->id === false ;
+    }
 
     /**
      * @return mixed
@@ -99,7 +107,7 @@ class Call {
 			|| $object['jsonrpc'] !== '2.0'
 			|| !array_key_exists('method', $object)
 			|| empty($object['method'])
-			|| !array_key_exists('id', $object)
+			//|| !array_key_exists('id', $object)
 		) {
 			throw new InvalidRequest() ;
 		}
@@ -122,13 +130,28 @@ class Call {
             $method = $this->resolveMethod($this->getMethod()) ;
             $result = $this->callMethod($method, $this->getParams()) ;
 
+            if($this->isNotification()) {
+                return new NullResult() ;
+            }
+
             return new Result($this->getId(), $result) ;
         }
         catch(AbstractException $e ) {
+
+            if($this->isNotification()) {
+                return new NullResult() ;
+            }
+
             $e->setId($this->getId()) ;
             return $e ;
         }
         catch(\Exception $e) { // catch EVERYTHING, is this a good idea?
+            //@codeCoverageIgnoreStart
+            if($this->isNotification()) {
+                return new NullResult() ;
+            }
+            //@codeCoverageIgnoreEnd
+
             return new InternalError('Internal error', -32603, $e->__toString(), $this->getId()) ;
         }
     }
@@ -217,7 +240,59 @@ class Call {
             return call_user_func($method) ;
         }
 
-        if($method_parameters[0]->getName() === 'params' && count($method_parameters) === 1) {
+        // is the call by order or with named parameters
+        if(!$this->isAssociative($params)) {
+            // call by order
+
+            if(count($params) !== count($method_parameters)) {
+                throw new InvalidParams('Call by order: not enough parameters') ;
+            }
+
+            return call_user_func_array($method, $params) ;
+        }
+        else {
+            // this is call with named parameters, we need to craft list with params in correct order
+            $paramsByOrder = array() ;
+
+            foreach($method_parameters as $method_parameter) {
+                // do we have a call parameter that matches this signature param?
+                $found = false ;
+                foreach($params as $paramName => $paramValue) {
+                    if($method_parameter->getName() === $paramName) {
+                        $found = true ;
+                        break;
+                    }
+                }
+
+                if(!$found) {
+                    throw new InvalidParams('Call with named parameters: param in method signature not found in call: '.$method_parameter->getName()) ;
+                }
+
+                $paramsByOrder[] = $paramValue ;
+            }
+
+            return call_user_func_array($method, $paramsByOrder) ;
+        }
+
+            /*foreach($params as $paramName => $paramValue) {
+                // do we have that parameter in method signature?
+                $found = false ;
+                foreach($method_parameters as $method_parameter) {
+                    if($method_parameter->getName() === $paramName) {
+                        $found = true ;
+                        break;
+                    }
+                }
+
+                if(!$found) {
+                    throw new InvalidParams('Call with named parameters: parameter in call which is not in method signature') ;
+                }
+
+
+            }
+        }*/
+
+        /*if($method_parameters[0]->getName() === 'params' && count($method_parameters) === 1) {
             // method wants passing by name
 
             if(!$this->isAssociative($params)) {
@@ -250,7 +325,7 @@ class Call {
 
             // call also is by order => good to go
             return call_user_func_array($method, $params) ;
-        }
+        }*/
     }
 
     /**
@@ -304,9 +379,12 @@ class Call {
 
         $callable = array(new $real_class($this->app), $method) ;
 
+        // @codeCoverageIgnoreStart
+        // this is just a sanity check
         if(!is_callable($callable)) {
             throw new MethodNotFound('Method '.$method.' in scope '.$class.' is not callable (this is probably a bug in server software).') ;
         }
+        // @codeCoverageIgnoreEnd
 
         // if we got until everything should be fine
         return $callable ;

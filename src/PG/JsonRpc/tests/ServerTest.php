@@ -31,7 +31,6 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
      * @covers \PG\JsonRpc\Server::__construct
      */
     public function testConstruct() {
-        var_dump($this->server['logger']) ;
         $this->assertInstanceOf('Monolog\Logger', $this->server['logger']) ;
     }
 
