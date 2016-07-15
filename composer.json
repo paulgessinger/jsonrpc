@@ -15,7 +15,7 @@
         "phpdocumentor/reflection-docblock": "1.0.*",
         "paulgessinger/common": "*",
         "symfony/http-foundation": "v2.5.0",
-        "monolog/monolog": "*",
+        "monolog/monolog": "v1.8.0",
         "pimple/pimple": "v2.0.0"
     },
     "require-dev": {
